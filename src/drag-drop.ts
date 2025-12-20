@@ -71,7 +71,6 @@ export class DragDropManager {
 	private createDropIndicator(): void {
 		this.dropIndicator = document.createElement('div');
 		this.dropIndicator.className = 'bases-kanban-drop-indicator';
-		this.dropIndicator.style.display = 'none';
 	}
 
 	/**
@@ -296,7 +295,7 @@ export class DragDropManager {
 		}
 
 		// Handle the drop
-		this.processCardDrop(entry, sourceColumnName, targetColumnName, sourceIndex, insertIndex);
+		void this.processCardDrop(entry, sourceColumnName, targetColumnName, sourceIndex, insertIndex);
 		this.clearDragState();
 	}
 
@@ -336,7 +335,7 @@ export class DragDropManager {
 		const cardsEl = e.currentTarget as HTMLElement;
 		const cardCount = cardsEl.querySelectorAll('.bases-kanban-card').length;
 
-		this.processCardDrop(entry, sourceColumnName, targetColumnName, sourceIndex, cardCount);
+		void this.processCardDrop(entry, sourceColumnName, targetColumnName, sourceIndex, cardCount);
 		this.clearDragState();
 	}
 
@@ -355,7 +354,7 @@ export class DragDropManager {
 		// Moving to different column - update the groupBy property
 		if (sourceColumnName !== targetColumnName) {
 			if (!groupByProperty) {
-				new Notice('Could not detect groupBy property for drag & drop');
+				new Notice('Could not detect the group by property for drag and drop');
 				return;
 			}
 
@@ -381,20 +380,20 @@ export class DragDropManager {
 	private showColumnDropIndicator(columnEl: HTMLElement, isLeft: boolean): void {
 		if (!this.dropIndicator || !this.boardEl) return;
 
-		this.dropIndicator.className = 'bases-kanban-drop-indicator bases-kanban-drop-indicator-column';
-		this.dropIndicator.style.display = 'block';
+		this.dropIndicator.className = 'bases-kanban-drop-indicator bases-kanban-drop-indicator-column is-visible';
 
 		const rect = columnEl.getBoundingClientRect();
 		const boardRect = this.boardEl.getBoundingClientRect();
 
-		this.dropIndicator.style.height = `${rect.height}px`;
-		this.dropIndicator.style.top = `${rect.top - boardRect.top}px`;
-		
-		if (isLeft) {
-			this.dropIndicator.style.left = `${rect.left - boardRect.left - 4}px`;
-		} else {
-			this.dropIndicator.style.left = `${rect.right - boardRect.left - 4}px`;
-		}
+		const leftPos = isLeft
+			? `${rect.left - boardRect.left - 4}px`
+			: `${rect.right - boardRect.left - 4}px`;
+
+		this.dropIndicator.setCssProps({
+			'--indicator-height': `${rect.height}px`,
+			'--indicator-top': `${rect.top - boardRect.top}px`,
+			'--indicator-left': leftPos,
+		});
 
 		this.boardEl.appendChild(this.dropIndicator);
 	}
@@ -402,21 +401,21 @@ export class DragDropManager {
 	private showCardDropIndicator(cardEl: HTMLElement, isAbove: boolean): void {
 		if (!this.dropIndicator) return;
 
-		this.dropIndicator.className = 'bases-kanban-drop-indicator bases-kanban-drop-indicator-card';
-		this.dropIndicator.style.display = 'block';
+		this.dropIndicator.className = 'bases-kanban-drop-indicator bases-kanban-drop-indicator-card is-visible';
 
 		const rect = cardEl.getBoundingClientRect();
 		const parentRect = cardEl.parentElement?.getBoundingClientRect();
 		if (!parentRect) return;
 
-		this.dropIndicator.style.width = `${rect.width}px`;
-		this.dropIndicator.style.left = `${rect.left - parentRect.left}px`;
-		
-		if (isAbove) {
-			this.dropIndicator.style.top = `${rect.top - parentRect.top - 4}px`;
-		} else {
-			this.dropIndicator.style.top = `${rect.bottom - parentRect.top}px`;
-		}
+		const topPos = isAbove
+			? `${rect.top - parentRect.top - 4}px`
+			: `${rect.bottom - parentRect.top}px`;
+
+		this.dropIndicator.setCssProps({
+			'--indicator-width': `${rect.width}px`,
+			'--indicator-left': `${rect.left - parentRect.left}px`,
+			'--indicator-top': topPos,
+		});
 
 		cardEl.parentElement?.appendChild(this.dropIndicator);
 	}
@@ -424,28 +423,29 @@ export class DragDropManager {
 	private showCardDropIndicatorAtEnd(cardsEl: HTMLElement): void {
 		if (!this.dropIndicator) return;
 
-		this.dropIndicator.className = 'bases-kanban-drop-indicator bases-kanban-drop-indicator-card';
-		this.dropIndicator.style.display = 'block';
+		this.dropIndicator.className = 'bases-kanban-drop-indicator bases-kanban-drop-indicator-card is-visible';
 
 		const rect = cardsEl.getBoundingClientRect();
 		const lastCard = cardsEl.querySelector('.bases-kanban-card:last-child');
 		
-		this.dropIndicator.style.width = `calc(100% - 16px)`;
-		this.dropIndicator.style.left = '8px';
-		
+		let topPos = '8px';
 		if (lastCard) {
 			const lastCardRect = lastCard.getBoundingClientRect();
-			this.dropIndicator.style.top = `${lastCardRect.bottom - rect.top + 4}px`;
-		} else {
-			this.dropIndicator.style.top = '8px';
+			topPos = `${lastCardRect.bottom - rect.top + 4}px`;
 		}
+
+		this.dropIndicator.setCssProps({
+			'--indicator-width': 'calc(100% - 16px)',
+			'--indicator-left': '8px',
+			'--indicator-top': topPos,
+		});
 
 		cardsEl.appendChild(this.dropIndicator);
 	}
 
 	private hideDropIndicator(): void {
 		if (this.dropIndicator) {
-			this.dropIndicator.style.display = 'none';
+			this.dropIndicator.removeClass('is-visible');
 		}
 	}
 

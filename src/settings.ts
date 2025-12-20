@@ -1,7 +1,7 @@
 import { App, PluginSettingTab } from 'obsidian';
 import BasesKanbanPlugin from './main';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Settings interface is intentionally empty for now, will be populated when plugin settings are added
 export interface KanbanSettings {
 	// Plugin-level settings can be added here
 }

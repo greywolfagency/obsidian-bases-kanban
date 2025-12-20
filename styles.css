@@ -417,6 +417,16 @@ body {
 	pointer-events: none;
 	z-index: 100;
 	transition: top 0.1s ease, left 0.1s ease;
+	display: none;
+	/* Positioning via CSS custom properties */
+	top: var(--indicator-top);
+	left: var(--indicator-left);
+	width: var(--indicator-width);
+	height: var(--indicator-height);
+}
+
+.bases-kanban-drop-indicator.is-visible {
+	display: block;
 }
 
 /* Column drop indicator - vertical line */

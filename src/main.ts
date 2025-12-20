@@ -12,7 +12,7 @@ export default class BasesKanbanPlugin extends Plugin {
 			name: 'Kanban',
 			icon: 'lucide-kanban',
 			factory: (controller, containerEl) => new KanbanView(controller, containerEl, this),
-			options: KanbanView.getViewOptions,
+			options: () => KanbanView.getViewOptions(),
 		});
 
 		this.addSettingTab(new KanbanSettingTab(this.app, this));

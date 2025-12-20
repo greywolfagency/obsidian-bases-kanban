@@ -86,7 +86,7 @@ export class KanbanView extends BasesView {
 		if (!hasGroupBy && groupedData.length <= 1) {
 			// No groupBy configured - show helpful message
 			this.containerEl.createEl('p', {
-				text: 'Set "Group by" in the Sort menu to organize cards into columns.',
+				text: 'Set "Group by" in the sort menu to organize cards into columns.',
 				cls: 'bases-kanban-placeholder'
 			});
 			return;
@@ -316,37 +316,40 @@ export class KanbanView extends BasesView {
 		return value.toString();
 	}
 
-	private async handleAddCard(columnValue: string | null): Promise<void> {
-		const modal = new AddCardModal(this.app, async (noteName) => {
+	private handleAddCard(columnValue: string | null): void {
+		const modal = new AddCardModal(this.app, (noteName) => {
 			if (!noteName) return;
-			
-			// Create the note
-			const fileName = noteName.endsWith('.md') ? noteName : `${noteName}.md`;
-			
-			try {
-				// Determine the folder - use current file's folder or root
-				const activeFile = this.app.workspace.getActiveFile();
-				const folder = activeFile?.parent?.path ?? '';
-				const fullPath = folder ? `${folder}/${fileName}` : fileName;
-				
-				// Create file with frontmatter if we have a column value
-				let content = '';
-				if (columnValue !== null && this.groupByProperty) {
-					content = `---\n${this.groupByProperty}: ${columnValue}\n---\n\n`;
-				}
-				
-				const file = await this.app.vault.create(fullPath, content);
-				
-				// Open the new file
-				const leaf = this.app.workspace.getLeaf();
-				await leaf.openFile(file);
-				
-				new Notice(`Created "${noteName}"`);
-			} catch (error) {
-				new Notice(`Failed to create note: ${error}`);
-			}
+			void this.createCardNote(noteName, columnValue);
 		});
 		modal.open();
+	}
+
+	private async createCardNote(noteName: string, columnValue: string | null): Promise<void> {
+		// Create the note
+		const fileName = noteName.endsWith('.md') ? noteName : `${noteName}.md`;
+		
+		try {
+			// Determine the folder - use current file's folder or root
+			const activeFile = this.app.workspace.getActiveFile();
+			const folder = activeFile?.parent?.path ?? '';
+			const fullPath = folder ? `${folder}/${fileName}` : fileName;
+			
+			// Create file with frontmatter if we have a column value
+			let content = '';
+			if (columnValue !== null && this.groupByProperty) {
+				content = `---\n${this.groupByProperty}: ${columnValue}\n---\n\n`;
+			}
+			
+			const file = await this.app.vault.create(fullPath, content);
+			
+			// Open the new file
+			const leaf = this.app.workspace.getLeaf();
+			await leaf.openFile(file);
+			
+			new Notice(`Created "${noteName}"`);
+		} catch (error) {
+			new Notice(`Failed to create note: ${error}`);
+		}
 	}
 
 	private handleAddColumn(): void {
@@ -354,39 +357,45 @@ export class KanbanView extends BasesView {
 		
 		// If we can't detect the groupBy property, prompt for it
 		if (!groupByProperty) {
-			new Notice('Could not detect groupBy property. Configure "Group by" in the Sort menu first.');
+			new Notice('Could not detect the group by property. Configure "Group by" in the sort menu first.');
 			return;
 		}
 
-		const modal = new AddColumnModal(this.app, this.data?.data ?? [], async (columnValue, selectedFiles) => {
+		const modal = new AddColumnModal(this.app, this.data?.data ?? [], (columnValue, selectedFiles) => {
 			if (!columnValue || selectedFiles.length === 0) return;
-			
-			// Update all selected files with the new property value using detected groupBy property
-			for (const entry of selectedFiles) {
-				await this.app.fileManager.processFrontMatter(entry.file, (fm) => {
-					fm[groupByProperty] = columnValue;
-				});
-			}
-			
-			new Notice(`Added "${groupByProperty}: ${columnValue}" to ${selectedFiles.length} files`);
+			void this.addColumnToFiles(groupByProperty, columnValue, selectedFiles);
 		});
 		modal.open();
 	}
 
 	private handleSetPropertyOnFiles(entries: BasesEntry[]): void {
 		// Open modal to select which property to set and what value
-		const modal = new SetPropertyModal(this.app, entries, async (propertyName, propertyValue) => {
+		const modal = new SetPropertyModal(this.app, entries, (propertyName, propertyValue) => {
 			if (!propertyName || !propertyValue) return;
-			
-			for (const entry of entries) {
-				await this.app.fileManager.processFrontMatter(entry.file, (fm) => {
-					fm[propertyName] = propertyValue;
-				});
-			}
-			
-			new Notice(`Set "${propertyName}: ${propertyValue}" on ${entries.length} files`);
+			void this.setPropertyOnEntries(entries, propertyName, propertyValue);
 		});
 		modal.open();
+	}
+
+	private async addColumnToFiles(groupByProperty: string, columnValue: string, selectedFiles: BasesEntry[]): Promise<void> {
+		// Update all selected files with the new property value using detected groupBy property
+		for (const entry of selectedFiles) {
+			await this.app.fileManager.processFrontMatter(entry.file, (fm) => {
+				fm[groupByProperty] = columnValue;
+			});
+		}
+		
+		new Notice(`Added "${groupByProperty}: ${columnValue}" to ${selectedFiles.length} files`);
+	}
+
+	private async setPropertyOnEntries(entries: BasesEntry[], propertyName: string, propertyValue: string): Promise<void> {
+		for (const entry of entries) {
+			await this.app.fileManager.processFrontMatter(entry.file, (fm) => {
+				fm[propertyName] = propertyValue;
+			});
+		}
+		
+		new Notice(`Set "${propertyName}: ${propertyValue}" on ${entries.length} files`);
 	}
 
 	// ==================== Drag & Drop Callbacks ====================
@@ -404,7 +413,7 @@ export class KanbanView extends BasesView {
 	private async handleCardMoveToColumn(file: TFile, newColumnValue: string): Promise<void> {
 		const groupByProperty = this.getGroupByPropertyFromConfig();
 		if (!groupByProperty) {
-			new Notice('Could not detect groupBy property. Ensure cards have frontmatter for the grouped property.');
+			new Notice('Could not detect the group by property. Ensure cards have frontmatter for the grouped property.');
 			return;
 		}
 
@@ -829,14 +838,14 @@ class SetPropertyModal extends Modal {
 			.setName('Property name')
 			.addText(text => {
 				this.propertyInput = text.inputEl;
-				text.setPlaceholder('e.g., status');
+				text.setPlaceholder('e.g. Status');
 			});
 		
 		new Setting(contentEl)
 			.setName('Value')
 			.addText(text => {
 				this.valueInput = text.inputEl;
-				text.setPlaceholder('e.g., todo');
+				text.setPlaceholder('e.g. Todo');
 			});
 		
 		new Setting(contentEl)

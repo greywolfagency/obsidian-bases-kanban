@@ -1,4 +1,6 @@
-# Bases Kanban
+# GWA Bases Kanban
+
+**GreyWolf Agency fork of [obsidian-bases-kanban](https://github.com/ewerx/obsidian-bases-kanban) with custom features for enhanced workflows.**
 
 Requires [Obsidian 1.10.6](https://obsidian.md/changelog/2025-11-25-desktop-v1.10.6/). This plugin adds a kanban layout to Obsidian Bases.
 
@@ -16,6 +18,7 @@ Adds a kanban layout to [Obsidian Bases](https://help.obsidian.md/bases) so you 
 -   **Drag to sort cards** within a column (requires a numeric sort property)
 -   **Add new cards** directly from any column
 -   **Click cards** to open the corresponding note
+-   **🆕 Custom card titles** - Use any property (frontmatter, formula, or file property) as the card title instead of filename
 
 ## Installation
 
@@ -52,6 +55,20 @@ npm run build
 
 -   **Moving cards between columns**: The groupBy property must be a frontmatter property (detected automatically from the Bases groupBy setting)
 -   **Reordering cards within columns**: Requires a single numeric sort property configured in the Bases Sort menu
+
+### Custom card titles (GWA fork feature)
+
+By default, cards display the filename. You can configure any property to use as the card title:
+
+1. Open the view options for your Bases Kanban view
+2. Set "Card title property" to the property name you want to use
+3. Supported formats:
+   - `task` - Frontmatter property (automatically prefixed with `note.`)
+   - `note.title` - Explicit frontmatter property
+   - `formula.myFormula` - Formula property
+   - `file.name` - File property
+
+If the property doesn't exist or is empty, the card falls back to showing the filename.
 
 ## How it works
 

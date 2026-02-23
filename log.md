@@ -43,6 +43,13 @@ Use these icons to categorize activity:
   - Build: Successfully compiled with no errors
   - Deployed: Pushed to https://github.com/greywolfagency/obsidian-bases-kanban
 
+- 📝 Renamed plugin to gwa-obsidian-bases-kanban (@mark)
+  - Commit: 2a1984b
+  - Changes: `manifest.json`, `package.json`, `README.md`
+  - Renamed plugin ID from `bases-kanban` to `gwa-obsidian-bases-kanban`
+  - Updated display name to "GWA Bases Kanban"
+  - Purpose: Differentiate fork from upstream in BART and plugin directory
+
 ---
 
 ## Log Instructions

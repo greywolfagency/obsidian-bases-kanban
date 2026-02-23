@@ -1,7 +1,7 @@
 {
 	"id": "gwa-obsidian-bases-kanban",
 	"name": "GWA Bases Kanban",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"minAppVersion": "1.10.0",
 	"description": "Adds a kanban layout to Bases (GreyWolf Agency fork with custom features).",
 	"author": "GreyWolf Agency (fork of ewerx/obsidian-bases-kanban)",

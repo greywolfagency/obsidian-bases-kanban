@@ -1,6 +1,6 @@
 {
 	"name": "gwa-obsidian-bases-kanban",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Adds kanban view to Obsidian Bases (GreyWolf Agency fork).",
 	"main": "main.js",
 	"scripts": {

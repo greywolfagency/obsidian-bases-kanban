@@ -1,12 +1,12 @@
-import { App, PluginSettingTab } from 'obsidian';
+import { App, PluginSettingTab, Setting } from 'obsidian';
 import BasesKanbanPlugin from './main';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Settings interface is intentionally empty for now, will be populated when plugin settings are added
 export interface KanbanSettings {
-	// Plugin-level settings can be added here
+	cardTitleProperty: string;
 }
 
 export const DEFAULT_SETTINGS: KanbanSettings = {
+	cardTitleProperty: '',
 };
 
 export class KanbanSettingTab extends PluginSettingTab {
@@ -21,10 +21,19 @@ export class KanbanSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		// Settings will be added here as needed
-		containerEl.createEl('p', {
-			text: 'Kanban view settings will appear here.',
-			cls: 'setting-item-description'
-		});
+		containerEl.createEl('h2', { text: 'GWA Bases Kanban Settings' });
+
+		new Setting(containerEl)
+			.setName('Card title property')
+			.setDesc('Property to use as card title (e.g., "title", "task", "formula.myFormula"). Leave empty to use filename.')
+			.addText(text => text
+				.setPlaceholder('e.g., title')
+				.setValue(this.plugin.settings.cardTitleProperty)
+				.onChange(async (value) => {
+					this.plugin.settings.cardTitleProperty = value.trim();
+					await this.plugin.saveSettings();
+					// Trigger a refresh of all kanban views
+					this.plugin.refreshViews();
+				}));
 	}
 }

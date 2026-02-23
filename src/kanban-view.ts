@@ -212,9 +212,9 @@ export class KanbanView extends BasesView {
 	 * Get the title for a card, using the configured property or falling back to filename
 	 */
 	private getCardTitle(entry: BasesEntry): string {
-		const cardTitleProperty = this.config?.get('cardTitleProperty');
+		const cardTitleProperty = this.plugin.settings.cardTitleProperty;
 
-		if (cardTitleProperty && typeof cardTitleProperty === 'string' && cardTitleProperty.length > 0) {
+		if (cardTitleProperty && cardTitleProperty.length > 0) {
 			// Try to get the value from the entry
 			// Support note., formula., and file. prefixes
 			let propId: BasesPropertyId;
@@ -682,17 +682,10 @@ export class KanbanView extends BasesView {
 	 * - groupBy: Uses the "Group by" setting from the Sort menu
 	 * - sort: Uses the sort property from the Sort menu (for in-column reordering)
 	 * - columnOrder: Persisted automatically when columns are reordered via drag & drop
-	 * - cardTitleProperty: Property to use as card title (defaults to filename)
+	 * - cardTitleProperty: Configured in plugin settings (not per-view)
 	 */
 	static getViewOptions(): ViewOption[] {
 		return [
-			{
-				key: 'cardTitleProperty',
-				displayName: 'Card title property',
-				type: 'text' as const,
-				default: '',
-				placeholder: 'e.g., task, title, formula (leave empty for filename)',
-			},
 			{
 				key: 'columnOrder',
 				displayName: 'Column order',

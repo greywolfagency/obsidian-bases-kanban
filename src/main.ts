@@ -26,6 +26,11 @@ export default class BasesKanbanPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
+	refreshViews() {
+		// Trigger a workspace layout update to refresh all kanban views
+		this.app.workspace.trigger('layout-change');
+	}
+
 	onunload() {
 	}
 }

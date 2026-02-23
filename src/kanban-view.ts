@@ -208,6 +208,40 @@ export class KanbanView extends BasesView {
 		return key.toString() || NO_VALUE_COLUMN;
 	}
 
+	/**
+	 * Get the title for a card, using the configured property or falling back to filename
+	 */
+	private getCardTitle(entry: BasesEntry): string {
+		const cardTitleProperty = this.config?.get('cardTitleProperty');
+
+		if (cardTitleProperty && typeof cardTitleProperty === 'string' && cardTitleProperty.length > 0) {
+			// Try to get the value from the entry
+			// Support note., formula., and file. prefixes
+			let propId: BasesPropertyId;
+			if (cardTitleProperty.startsWith('note.') ||
+				cardTitleProperty.startsWith('formula.') ||
+				cardTitleProperty.startsWith('file.')) {
+				propId = cardTitleProperty as BasesPropertyId;
+			} else {
+				// Default to note. prefix for frontmatter properties
+				propId = `note.${cardTitleProperty}` as BasesPropertyId;
+			}
+
+			const value = entry.getValue(propId);
+
+			// If we have a value and it's not null/empty, use it
+			if (value && !(value instanceof NullValue)) {
+				const titleString = value.toString().trim();
+				if (titleString.length > 0) {
+					return titleString;
+				}
+			}
+		}
+
+		// Fall back to file basename
+		return entry.file.basename;
+	}
+
 	private renderCard(container: HTMLElement, entry: BasesEntry, columnName: string, cardIndex: number): void {
 		const cardEl = container.createDiv({ cls: 'bases-kanban-card' });
 
@@ -216,12 +250,13 @@ export class KanbanView extends BasesView {
 		cardEl.dataset.columnName = columnName;
 		cardEl.dataset.cardIndex = String(cardIndex);
 
-		// Card title (always file name)
+		// Card title - use configured property or fall back to file name
 		const titleEl = cardEl.createDiv({ cls: 'bases-kanban-card-title' });
 		const filePath = entry.file.path;
-		
-		const link = titleEl.createEl('a', { 
-			text: entry.file.basename,
+
+		const cardTitle = this.getCardTitle(entry);
+		const link = titleEl.createEl('a', {
+			text: cardTitle,
 			cls: 'internal-link'
 		});
 		link.addEventListener('click', (evt) => {
@@ -642,14 +677,22 @@ export class KanbanView extends BasesView {
 
 	/**
 	 * View options exposed to Bases for configuration persistence.
-	 * 
+	 *
 	 * Note: groupBy and sort properties are automatically detected from Bases config.
 	 * - groupBy: Uses the "Group by" setting from the Sort menu
 	 * - sort: Uses the sort property from the Sort menu (for in-column reordering)
 	 * - columnOrder: Persisted automatically when columns are reordered via drag & drop
+	 * - cardTitleProperty: Property to use as card title (defaults to filename)
 	 */
 	static getViewOptions(): ViewOption[] {
 		return [
+			{
+				key: 'cardTitleProperty',
+				displayName: 'Card title property',
+				type: 'text' as const,
+				default: '',
+				placeholder: 'e.g., task, title, formula (leave empty for filename)',
+			},
 			{
 				key: 'columnOrder',
 				displayName: 'Column order',

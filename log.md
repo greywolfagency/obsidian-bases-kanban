@@ -56,6 +56,18 @@ Use these icons to categorize activity:
   - Purpose: Enable BRAT installation
   - Notes: Manual release via gh CLI (GitHub Actions workflow needs to be enabled)
 
+- 🔧 Moved card title property to plugin settings (@mark)
+  - Commits: 227a6b0, 627ba1d
+  - Changes: `src/settings.ts`, `src/main.ts`, `src/kanban-view.ts`
+  - Feature: Added dedicated plugin settings page with card title property configuration
+  - Improved: Better discoverability - users can now find setting in Settings → Community plugins
+  - Setting now applies globally across all kanban views
+
+- 🚀 Created v0.1.2 release (@mark)
+  - Release: https://github.com/greywolfagency/obsidian-bases-kanban/releases/tag/0.1.2
+  - Files: main.js, manifest.json, styles.css
+  - Purpose: Release settings page feature
+
 ---
 
 ## Log Instructions

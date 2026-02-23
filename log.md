@@ -48,7 +48,13 @@ Use these icons to categorize activity:
   - Changes: `manifest.json`, `package.json`, `README.md`
   - Renamed plugin ID from `bases-kanban` to `gwa-obsidian-bases-kanban`
   - Updated display name to "GWA Bases Kanban"
-  - Purpose: Differentiate fork from upstream in BART and plugin directory
+  - Purpose: Differentiate fork from upstream in BRAT and plugin directory
+
+- 🚀 Created v0.1.1 release (@mark)
+  - Release: https://github.com/greywolfagency/obsidian-bases-kanban/releases/tag/0.1.1
+  - Files: main.js, manifest.json, styles.css
+  - Purpose: Enable BRAT installation
+  - Notes: Manual release via gh CLI (GitHub Actions workflow needs to be enabled)
 
 ---
 
